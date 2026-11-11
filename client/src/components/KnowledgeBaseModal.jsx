@@ -86,3 +86,4 @@ export default function KnowledgeBaseModal({ isOpen, onClose, categories = [] })
     </div>
   );
 }
+

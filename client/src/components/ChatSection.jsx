@@ -14,7 +14,10 @@ import {
   ArrowRight, 
   RefreshCw,
   CornerDownLeft,
-  ExternalLink
+  ExternalLink,
+  Volume2,
+  VolumeX,
+  Download
 } from 'lucide-react';
 
 export default function ChatSection({ 
@@ -27,6 +30,7 @@ export default function ChatSection({
   const [inputText, setInputText] = useState('');
   const [copiedId, setCopiedId] = useState(null);
   const [feedbackState, setFeedbackState] = useState({});
+  const [speakingId, setSpeakingId] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -34,6 +38,15 @@ export default function ChatSection({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  // Clean up speech synthesis on unmount
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -60,6 +73,45 @@ export default function ChatSection({
       ...prev,
       [id]: type
     }));
+  };
+
+  const handleSpeak = (id, text) => {
+    if (!('speechSynthesis' in window)) return;
+
+    if (speakingId === id) {
+      window.speechSynthesis.cancel();
+      setSpeakingId(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.onend = () => setSpeakingId(null);
+    utterance.onerror = () => setSpeakingId(null);
+
+    setSpeakingId(id);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleExportChat = () => {
+    if (messages.length === 0) return;
+    const header = `PRESIDENCY UNIVERSITY - CAMPUS CONNECT AI CHAT TRANSCRIPT\nDate: ${new Date().toLocaleString()}\n------------------------------------------------------------\n\n`;
+    const body = messages.map(m => {
+      const role = m.sender === 'user' ? 'STUDENT' : `CAMPUS BUDDY AI [${m.category || 'General'}]`;
+      const content = m.sender === 'user' ? m.text : m.response;
+      return `[${m.time}] ${role}:\n${content}\n`;
+    }).join('\n');
+
+    const fullText = header + body;
+    const blob = new Blob([fullText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `campus-connect-chat-${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -91,14 +143,24 @@ export default function ChatSection({
         {/* Chat Actions */}
         <div className="flex items-center gap-2">
           {messages.length > 0 && (
-            <button
-              onClick={onClearChat}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-300 hover:text-white bg-rose-950/60 hover:bg-rose-900/80 border border-rose-800/60 rounded-xl transition-all"
-              title="Clear entire conversation"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Clear Chat</span>
-            </button>
+            <>
+              <button
+                onClick={handleExportChat}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-200 hover:text-white bg-blue-900/60 hover:bg-blue-800/80 border border-blue-700/60 rounded-xl transition-all shadow-sm"
+                title="Download chat transcript"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Export</span>
+              </button>
+              <button
+                onClick={onClearChat}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-300 hover:text-white bg-rose-950/60 hover:bg-rose-900/80 border border-rose-800/60 rounded-xl transition-all"
+                title="Clear entire conversation"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Clear Chat</span>
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -259,24 +321,48 @@ export default function ChatSection({
                       )}
                     </div>
 
-                    {/* Copy Button */}
-                    <button
-                      onClick={() => handleCopy(msg.id, msg.response)}
-                      className="flex items-center gap-1 text-slate-400 hover:text-slate-700 p-1 rounded hover:bg-slate-100 transition-colors"
-                      title="Copy response to clipboard"
-                    >
-                      {copiedId === msg.id ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span className="text-[11px] text-emerald-600 font-medium">Copied</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          <span className="text-[11px]">Copy</span>
-                        </>
-                      )}
-                    </button>
+                    {/* Actions Right Side: Listen & Copy */}
+                    <div className="flex items-center gap-1.5">
+                      {/* Read Aloud Button */}
+                      <button
+                        onClick={() => handleSpeak(msg.id, msg.response)}
+                        className={`flex items-center gap-1 p-1.5 rounded-lg hover:bg-slate-100 transition-colors ${
+                          speakingId === msg.id ? 'text-blue-600 font-semibold bg-blue-50' : 'text-slate-400 hover:text-slate-700'
+                        }`}
+                        title={speakingId === msg.id ? "Stop reading" : "Listen to response"}
+                      >
+                        {speakingId === msg.id ? (
+                          <>
+                            <VolumeX className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
+                            <span className="text-[11px] text-blue-600">Stop</span>
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-3.5 h-3.5" />
+                            <span className="text-[11px]">Listen</span>
+                          </>
+                        )}
+                      </button>
+
+                      {/* Copy Button */}
+                      <button
+                        onClick={() => handleCopy(msg.id, msg.response)}
+                        className="flex items-center gap-1 text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                        title="Copy response to clipboard"
+                      >
+                        {copiedId === msg.id ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            <span className="text-[11px] text-emerald-600 font-medium">Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span className="text-[11px]">Copy</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -349,3 +435,4 @@ export default function ChatSection({
     </div>
   );
 }
+

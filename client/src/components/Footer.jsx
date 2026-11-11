@@ -83,3 +83,4 @@ export default function Footer({ onOpenKB, onOpenTester }) {
     </footer>
   );
 }
+

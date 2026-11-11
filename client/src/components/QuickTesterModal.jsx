@@ -7,7 +7,8 @@ import {
   HelpCircle, 
   AlertTriangle,
   Sparkles,
-  Info
+  Info,
+  MessageSquare
 } from 'lucide-react';
 
 export default function QuickTesterModal({ isOpen, onClose, onRunTestQuery }) {
@@ -16,46 +17,70 @@ export default function QuickTesterModal({ isOpen, onClose, onRunTestQuery }) {
   const testCases = [
     {
       id: 1,
-      category: 'Academics',
+      category: 'Conversational (Greeting)',
+      question: 'Hi',
+      expected: 'Warm student welcome & introduction from Campus Connect.',
+      badge: 'Conversational',
+      badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200'
+    },
+    {
+      id: 2,
+      category: 'Conversational (Identity)',
+      question: 'Who are you?',
+      expected: 'Introduces Campus Connect, AI-powered Presidency University assistant.',
+      badge: 'Identity',
+      badgeColor: 'bg-blue-100 text-blue-800 border-blue-200'
+    },
+    {
+      id: 3,
+      category: 'Conversational (Capabilities)',
+      question: 'What can you do?',
+      expected: 'Explains guidance across 8 official campus departments.',
+      badge: 'Capabilities',
+      badgeColor: 'bg-indigo-100 text-indigo-800 border-indigo-200'
+    },
+    {
+      id: 4,
+      category: 'Academics (Section 5)',
       question: 'Whom should I contact for academic problems?',
       expected: 'Suggest contacting the faculty advisor.',
       badge: 'Mandatory',
       badgeColor: 'bg-blue-100 text-blue-800 border-blue-200'
     },
     {
-      id: 2,
-      category: 'Examinations',
+      id: 5,
+      category: 'Examinations (Section 5)',
       question: 'Where can I find the examination timetable?',
       expected: 'Refer to official university channels.',
       badge: 'Mandatory',
       badgeColor: 'bg-purple-100 text-purple-800 border-purple-200'
     },
     {
-      id: 3,
-      category: 'Placements',
+      id: 6,
+      category: 'Placements (Section 5)',
       question: 'Whom should I contact for placement training?',
       expected: 'Suggest contacting the Placement Department.',
       badge: 'Mandatory',
       badgeColor: 'bg-amber-100 text-amber-800 border-amber-200'
     },
     {
-      id: 4,
-      category: 'Hostel',
+      id: 7,
+      category: 'Hostel (Section 5)',
       question: 'How can I raise a hostel complaint?',
       expected: 'Refer to Hostel Administration.',
       badge: 'Mandatory',
       badgeColor: 'bg-rose-100 text-rose-800 border-rose-200'
     },
     {
-      id: 5,
-      category: 'Unknown / Anti-Hallucination',
+      id: 8,
+      category: 'Unknown Detail / Anti-Hallucination',
       question: 'What is the exact date of my next examination?',
       expected: 'State that the date is unavailable in the supplied data. Do not make up a date.',
-      badge: 'Evaluation Test',
+      badge: 'Anti-Hallucination',
       badgeColor: 'bg-red-100 text-red-800 border-red-200'
     },
     {
-      id: 6,
+      id: 9,
       category: 'Attendance Norms',
       question: 'What is the minimum attendance requirement?',
       expected: 'Follow the minimum attendance requirement prescribed by university regulations.',
@@ -63,8 +88,8 @@ export default function QuickTesterModal({ isOpen, onClose, onRunTestQuery }) {
       badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200'
     },
     {
-      id: 7,
-      category: 'Out of Scope',
+      id: 10,
+      category: 'Out of Scope Guardrail',
       question: 'What is the capital of Australia?',
       expected: 'Politely explain that answer is not in the supplied university data.',
       badge: 'Guardrail Test',
@@ -86,7 +111,7 @@ export default function QuickTesterModal({ isOpen, onClose, onRunTestQuery }) {
                 Judge & Evaluation Test Suite
               </h3>
               <p className="text-xs text-blue-200">
-                Official queries from Presidency University Problem Statement (Section 5)
+                Official queries from Presidency University Problem Statement (Section 5) & Conversational Tests
               </p>
             </div>
           </div>
@@ -102,16 +127,16 @@ export default function QuickTesterModal({ isOpen, onClose, onRunTestQuery }) {
         <div className="bg-blue-50 border-b border-blue-100 px-5 py-3 flex items-start gap-3 text-xs text-blue-900">
           <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
           <p>
-            Click <strong className="font-semibold">Run Test</strong> on any test case to automatically send the query to the AI and inspect how it handles intent recognition and anti-hallucination rules.
+            Click <strong className="font-semibold">Run Test</strong> on any test case to automatically send the query to the AI and inspect how it handles conversational greetings, intent recognition, and anti-hallucination rules.
           </p>
         </div>
 
         {/* Test List */}
-        <div className="overflow-y-auto p-5 space-y-3.5">
+        <div className="overflow-y-auto p-5 space-y-3">
           {testCases.map((tc) => (
             <div
               key={tc.id}
-              className="p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50/40 border border-slate-200 hover:border-indigo-200 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              className="p-3.5 rounded-2xl bg-slate-50 hover:bg-indigo-50/40 border border-slate-200 hover:border-indigo-200 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
             >
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
@@ -135,7 +160,7 @@ export default function QuickTesterModal({ isOpen, onClose, onRunTestQuery }) {
                   onRunTestQuery(tc.question);
                   onClose();
                 }}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition-all flex-shrink-0"
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition-all flex-shrink-0"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>Run Test</span>

@@ -4,15 +4,30 @@ import {
   Sparkles, 
   ArrowRight, 
   CheckCircle2, 
-  HelpCircle, 
   Zap, 
   Bot,
-  ShieldCheck
+  ShieldCheck,
+  MapPin,
+  Image as ImageIcon,
+  MessageSquare
 } from 'lucide-react';
 
 export default function HeroSection({ onSubmitQuery, onSelectSuggestedQuery }) {
   const [searchInput, setSearchInput] = useState('');
   const [greeting, setGreeting] = useState('Welcome');
+  const [bgIndex, setBgIndex] = useState(0);
+
+  // Background photos supplied by Presidency University
+  const heroBackgrounds = [
+    {
+      url: '/images/presidency-campus-aerial.jpg',
+      label: 'Campus Aerial & Central Fountain'
+    },
+    {
+      url: '/images/presidency-campus-gate.jpg',
+      label: 'Main University Entrance Gate'
+    }
+  ];
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -33,51 +48,73 @@ export default function HeroSection({ onSubmitQuery, onSelectSuggestedQuery }) {
     { text: 'Where can I find the examination timetable?', category: 'Examinations' },
     { text: 'Whom should I contact for placement training?', category: 'Placements' },
     { text: 'How can I raise a hostel complaint?', category: 'Hostel' },
-    { text: 'What is the exact date of my next examination?', category: 'Examinations (Edge)' }
+    { text: 'What is the exact date of my next examination?', category: 'Edge Test' },
+    { text: 'Who are you?', category: 'Conversational' }
   ];
 
   return (
-    <section className="relative overflow-hidden pt-8 pb-10 bg-gradient-to-b from-blue-50/70 via-slate-50 to-slate-50 border-b border-slate-200">
-      {/* Decorative background glow circles */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2"></div>
-      <div className="absolute top-10 right-10 w-80 h-80 bg-indigo-400/10 rounded-full blur-3xl pointer-events-none"></div>
+    <section className="relative overflow-hidden py-14 sm:py-20 text-white min-h-[540px] flex items-center justify-center">
+      {/* Background Image Layer with smooth fade */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 transform scale-105"
+        style={{ backgroundImage: `url(${heroBackgrounds[bgIndex].url})` }}
+      />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      {/* Subtle Dark Glassmorphism Gradient Overlay to ensure crisp text readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-navy-950/75 to-slate-950/90 backdrop-blur-[2px]" />
+
+      {/* Decorative radial lighting */}
+      <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
+
+      {/* View Switcher Pill (Top Right of Hero) */}
+      <div className="absolute top-4 right-4 z-20 hidden sm:flex items-center gap-2">
+        <button
+          onClick={() => setBgIndex(prev => (prev === 0 ? 1 : 0))}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-[11px] text-slate-200 transition-all shadow-md"
+          title="Switch campus view"
+        >
+          <ImageIcon className="w-3.5 h-3.5 text-blue-400" />
+          <span>View: {heroBackgrounds[bgIndex].label}</span>
+        </button>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="text-center max-w-3xl mx-auto">
-          {/* Friendly Greeting Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-blue-200 shadow-sm text-xs font-semibold text-blue-900 mb-4 animate-fade-in">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
-            <span>{greeting}, Student! 👋 Welcome to Campus Helpdesk</span>
+          {/* Authentic Presidency University Location Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/20 text-xs font-semibold text-blue-200 mb-4 animate-fade-in shadow-lg">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <MapPin className="w-3.5 h-3.5 text-blue-300" />
+            <span>Presidency University, Bengaluru • {greeting}, Student! 👋</span>
           </div>
 
           {/* Main Title & Catchphrase */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight font-heading leading-tight mb-3">
-            Welcome to <span className="bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-600 bg-clip-text text-transparent">Presidency University</span> Campus Helpdesk!
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight font-heading leading-tight mb-4 drop-shadow-md">
+            CAMPUS <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-300 bg-clip-text text-transparent">CONNECT</span>
           </h1>
-          <p className="text-base sm:text-lg text-slate-600 font-medium max-w-2xl mx-auto mb-6">
-            Study Smart... Get Help Instantly! Your verified AI assistant for academics, exams, placements, hostel, and student services.
+          <p className="text-base sm:text-xl text-slate-200 font-medium max-w-2xl mx-auto mb-8 drop-shadow">
+            Study Smart... Get Help Instantly! Your verified AI assistant for academics, examinations, placements, hostel & campus life.
           </p>
 
           {/* Prominent AI Search / Query Bar */}
           <form 
             onSubmit={handleSubmit}
-            className="relative max-w-2xl mx-auto shadow-xl shadow-blue-500/10 rounded-2xl bg-white p-2 border-2 border-blue-500/40 hover:border-blue-500 transition-all focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-100"
+            className="relative max-w-2xl mx-auto shadow-2xl shadow-blue-900/30 rounded-2xl bg-white/95 backdrop-blur-md p-2 border-2 border-blue-400/50 hover:border-blue-400 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-400/20 transition-all text-slate-800"
           >
             <div className="flex items-center gap-3 px-3">
-              <div className="p-2 rounded-xl bg-blue-50 text-blue-600 flex-shrink-0">
+              <div className="p-2.5 rounded-xl bg-blue-600 text-white flex-shrink-0 shadow-md">
                 <Search className="w-5 h-5" />
               </div>
               <input
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Ask your university question in natural language... (e.g., Whom should I contact for academic problems?)"
+                placeholder="Ask your university question in natural language... (e.g. Whom should I contact for academic problems?)"
                 className="w-full text-sm sm:text-base text-slate-800 placeholder-slate-400 bg-transparent outline-none font-medium py-2"
               />
               <button
                 type="submit"
                 disabled={!searchInput.trim()}
-                className="flex-shrink-0 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold shadow-md shadow-blue-600/20 transition-all"
+                className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold shadow-md shadow-blue-600/30 transition-all"
               >
                 <span>Ask AI</span>
                 <ArrowRight className="w-4 h-4" />
@@ -85,44 +122,44 @@ export default function HeroSection({ onSubmitQuery, onSelectSuggestedQuery }) {
             </div>
           </form>
 
-          {/* Suggested Quick Question Chips */}
-          <div className="mt-5 flex flex-wrap justify-center items-center gap-2">
-            <span className="text-xs font-semibold text-slate-500 flex items-center gap-1 mr-1">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              Try asking:
+          {/* Quick Query Suggestion Chips */}
+          <div className="mt-6 flex flex-wrap justify-center items-center gap-2">
+            <span className="text-xs font-semibold text-blue-200 flex items-center gap-1 mr-1">
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              Popular questions:
             </span>
             {sampleChips.map((chip, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => onSelectSuggestedQuery(chip.text)}
-                className="text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-blue-300 transition-all shadow-sm flex items-center gap-1.5 group"
+                className="text-xs bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-3.5 py-1.5 rounded-xl border border-white/15 hover:border-blue-300/40 transition-all shadow-sm flex items-center gap-1.5 group"
               >
                 <span className="truncate max-w-[220px] sm:max-w-none">{chip.text}</span>
-                <span className="text-[10px] uppercase font-bold text-slate-400 group-hover:text-blue-500">
+                <span className="text-[10px] uppercase font-bold text-blue-300 group-hover:text-amber-300">
                   {chip.category}
                 </span>
               </button>
             ))}
           </div>
 
-          {/* Feature Highlights Pills */}
-          <div className="mt-8 pt-6 border-t border-slate-200/80 flex flex-wrap justify-center items-center gap-4 sm:gap-8 text-xs font-medium text-slate-600">
+          {/* Trust & Capability Badges */}
+          <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap justify-center items-center gap-4 sm:gap-8 text-xs font-medium text-slate-300">
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>8 Official Campus Services</span>
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>8 Official Campus Divisions</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-blue-600" />
-              <span>100% Grounded (Zero Hallucinations)</span>
+              <ShieldCheck className="w-4 h-4 text-blue-400" />
+              <span>100% Grounded (Anti-Hallucination)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Zap className="w-4 h-4 text-amber-500" />
-              <span>Instant AI Responses</span>
+              <MessageSquare className="w-4 h-4 text-amber-400" />
+              <span>Natural Conversational Dialogue</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Bot className="w-4 h-4 text-indigo-600" />
-              <span>Context-Aware Conversations</span>
+              <Bot className="w-4 h-4 text-cyan-400" />
+              <span>Powered by Google Gemini</span>
             </div>
           </div>
         </div>

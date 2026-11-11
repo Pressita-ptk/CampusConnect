@@ -1,7 +1,7 @@
 const { answerStudentQuery, KNOWLEDGE_BASE } = require('./server/geminiService');
 
 async function testAll() {
-  console.log('--- CAMPUS CONNECT INTEGRATION TESTS ---');
+  console.log('--- CAMPUS CONNECT INTEGRATION & CONVERSATION TESTS ---');
 
   // Test 1: Knowledge Base verification
   const categories = Object.keys(KNOWLEDGE_BASE);
@@ -10,8 +10,34 @@ async function testAll() {
     throw new Error(`Expected 8 categories, found ${categories.length}`);
   }
 
-  // Test 2: Mandatory Test Queries from Section 5 of Problem Statement
+  // Test 2: Comprehensive Test Suite
   const testCases = [
+    // Conversational & Greeting Tests (Requirement 1)
+    {
+      q: 'Hi',
+      expectedCategory: 'conversational',
+      mustInclude: 'Campus Connect',
+      expectAvailable: true
+    },
+    {
+      q: 'Hello',
+      expectedCategory: 'conversational',
+      mustInclude: 'assist',
+      expectAvailable: true
+    },
+    {
+      q: 'Who are you?',
+      expectedCategory: 'conversational',
+      mustInclude: 'university helpdesk assistant',
+      expectAvailable: true
+    },
+    {
+      q: 'What can you do?',
+      expectedCategory: 'conversational',
+      mustInclude: 'various university services',
+      expectAvailable: true
+    },
+    // Mandatory Section 5 University Tests
     {
       q: 'Whom should I contact for academic problems?',
       expectedCategory: 'academics',
@@ -74,7 +100,7 @@ async function testAll() {
     }
   ];
 
-  console.log('\n--- Running Test Queries Against Grounded Logic ---');
+  console.log('\n--- Running Test Queries Against Grounded & Conversational Logic ---');
   let passedCount = 0;
 
   for (const tc of testCases) {

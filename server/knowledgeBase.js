@@ -1,9 +1,7 @@
 /**
  * CAMPUS CONNECT - Knowledge Base
  * Authoritative University Information as per TECHNOPIA 2.0 Competition Specifications
- * 
- * RULE: Strictly grounded in this supplied data. No hallucinations, no invented dates,
- * contact numbers, fees, or regulations.
+ * Presidency University, Bengaluru | School of Computer Science & Engineering
  */
 
 const KNOWLEDGE_BASE = {
@@ -12,6 +10,7 @@ const KNOWLEDGE_BASE = {
     title: 'Academics',
     description: 'Faculty advisory, course guidance, and curriculum support.',
     icon: 'GraduationCap',
+    image: '/images/cat-academics.jpg',
     color: 'from-blue-500 to-indigo-600',
     badgeColor: 'bg-blue-100 text-blue-800 border-blue-200',
     officialStatement: 'Students may contact their faculty advisor for academic-related assistance.',
@@ -28,6 +27,7 @@ const KNOWLEDGE_BASE = {
     title: 'Attendance',
     description: 'Attendance rules, minimum percentage, and institutional norms.',
     icon: 'UserCheck',
+    image: '/images/cat-attendance.jpg',
     color: 'from-emerald-500 to-teal-600',
     badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
     officialStatement: 'Students should follow the minimum attendance requirement prescribed by university regulations.',
@@ -44,6 +44,7 @@ const KNOWLEDGE_BASE = {
     title: 'Examinations',
     description: 'Exam schedules, timetable releases, and exam circulars.',
     icon: 'FileText',
+    image: '/images/cat-examinations.jpg',
     color: 'from-violet-500 to-purple-600',
     badgeColor: 'bg-purple-100 text-purple-800 border-purple-200',
     officialStatement: 'Examination timetables and notifications are published through official university channels.',
@@ -60,6 +61,7 @@ const KNOWLEDGE_BASE = {
     title: 'Placements',
     description: 'Campus placement drives, interview preparation, and internships.',
     icon: 'Briefcase',
+    image: '/images/cat-placements.jpg',
     color: 'from-amber-500 to-orange-600',
     badgeColor: 'bg-amber-100 text-amber-800 border-amber-200',
     officialStatement: 'Students may contact the Placement Department for training and placement-related information.',
@@ -76,6 +78,7 @@ const KNOWLEDGE_BASE = {
     title: 'Library',
     description: 'Book borrowing, digital resources, study rooms, and access hours.',
     icon: 'BookOpen',
+    image: '/images/cat-library.jpg',
     color: 'from-cyan-500 to-blue-600',
     badgeColor: 'bg-cyan-100 text-cyan-800 border-cyan-200',
     officialStatement: "Students may access library resources according to the library's timings and regulations.",
@@ -92,6 +95,7 @@ const KNOWLEDGE_BASE = {
     title: 'Hostel',
     description: 'Accommodation grievances, maintenance, warden and room facilities.',
     icon: 'Home',
+    image: '/images/cat-hostel.jpg',
     color: 'from-rose-500 to-pink-600',
     badgeColor: 'bg-rose-100 text-rose-800 border-rose-200',
     officialStatement: 'Hostel-related complaints should be submitted to the Hostel Administration.',
@@ -108,6 +112,7 @@ const KNOWLEDGE_BASE = {
     title: 'Administration',
     description: 'Bonafide certificates, transcripts, ID cards, and official records.',
     icon: 'Building2',
+    image: '/images/cat-administration.jpg',
     color: 'from-slate-600 to-zinc-800',
     badgeColor: 'bg-slate-100 text-slate-800 border-slate-200',
     officialStatement: 'Students may contact the respective administrative office for certificates and student records.',
@@ -124,6 +129,7 @@ const KNOWLEDGE_BASE = {
     title: 'Events',
     description: 'Fests, technical symposiums, workshops, and campus activities.',
     icon: 'Calendar',
+    image: '/images/cat-events.jpg',
     color: 'from-fuchsia-500 to-pink-600',
     badgeColor: 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200',
     officialStatement: 'University event announcements are shared through official communication channels.',
@@ -137,10 +143,29 @@ const KNOWLEDGE_BASE = {
 };
 
 const SYSTEM_PROMPT = `
-You are the official Campus Connect AI Helpdesk Assistant for Presidency University.
-Your mission is to provide accurate, helpful, friendly, and grounded support to students.
+You are Campus Connect, the friendly, intelligent AI-Powered University Student Support Assistant for Presidency University, Bengaluru.
+Your goal is to be a welcoming, knowledgeable, and empathetic assistant for students, supporting both conversational dialogue and strictly grounded university information inquiries.
 
-KNOWLEDGE BASE (Authoritative Information):
+CONVERSATIONAL & GREETING BEHAVIOR:
+1. GREETINGS (Hi, Hello, Hey, Good morning, Good evening, etc.):
+   - Greet the student warmly, introduce Campus Connect, and ask how you can help.
+   - Example: "Hello! 👋 Welcome to Campus Connect. I'm your AI-powered university assistant. How can I help you today?"
+   - Category: "conversational"
+   - isAvailableInKB: true
+
+2. IDENTITY & CAPABILITIES ("Who are you?", "What can you do?", "What is Campus Connect?", etc.):
+   - Introduce yourself as Campus Connect, Presidency University's AI helpdesk assistant.
+   - Mention that you guide students regarding: Academics, Attendance, Examinations, Placements, Library, Hostel, Administration, and Events.
+   - Example: "I'm Campus Connect, your AI-powered university helpdesk assistant. I can help you find information about academics, attendance, examinations, placements, hostel facilities, library services, administration and university events."
+   - Category: "conversational"
+   - isAvailableInKB: true
+
+3. POLITE COURTESIES ("Thank you", "Thanks", "Bye", "Goodbye", "Awesome"):
+   - Respond cordially and offer ongoing help.
+   - Category: "conversational"
+   - isAvailableInKB: true
+
+OFFICIAL UNIVERSITY KNOWLEDGE BASE:
 1. Academics: Students may contact their faculty advisor for academic-related assistance.
 2. Attendance: Students should follow the minimum attendance requirement prescribed by university regulations.
 3. Examinations: Examination timetables and notifications are published through official university channels.
@@ -151,16 +176,16 @@ KNOWLEDGE BASE (Authoritative Information):
 8. Events: University event announcements are shared through official communication channels.
 
 CRITICAL RULES:
-1. ONLY answer using the supplied university information above.
-2. NEVER invent or hallucinate policies, dates, phone numbers, email addresses, fee amounts, room numbers, or regulations that are not stated.
-3. If a student asks for information not contained in the knowledge base (e.g. "What is the exact date of my next examination?", "What is the library fee?", "What is the name of the placement director?", "Who is winning the cricket match?"):
-   - For specific details regarding a covered topic (e.g., exact exam date): Politely state that the specific detail is not available in the supplied university information and direct them to the appropriate official authority/channel.
-   - For completely unrelated topics: Politely explain that as the University Campus Helpdesk, you can only provide information regarding university services (Academics, Attendance, Examinations, Placements, Library, Hostel, Administration, Events).
-4. Maintain a polite, empathetic, and student-friendly tone.
-5. Provide concise, clear, and structured answers.
+1. When answering university questions, ONLY answer using the supplied university information above.
+2. NEVER invent or hallucinate university policies, dates, phone numbers, email addresses, fee amounts, room numbers, or regulations that are not stated.
+3. If a student asks for information not contained in the knowledge base:
+   - For specific details regarding a covered topic (e.g., exact exam date, exact attendance %): Politely state that the specific detail is not available in the supplied university information and direct them to the appropriate official authority/channel.
+   - For completely unrelated questions (e.g. "What is the capital of France?"): Politely explain that as the Presidency University Campus Helpdesk, you can only provide information regarding university services (Academics, Attendance, Examinations, Placements, Library, Hostel, Administration, Events).
+4. Maintain a polite, encouraging, and student-friendly tone.
+5. Provide concise, clear, and well-structured answers.
 6. You will output a JSON object containing:
    - "response": The student-friendly textual response.
-   - "category": The identified category id (one of: "academics", "attendance", "examinations", "placements", "library", "hostel", "administration", "events", or "general" / "unknown").
+   - "category": The identified category id (e.g. "academics", "attendance", "examinations", "placements", "library", "hostel", "administration", "events", "conversational", or "unknown").
    - "confidence": "high", "medium", or "low".
    - "isAvailableInKB": true or false (false if the specific question details cannot be answered from the KB).
    - "suggestedFollowUps": Array of 2-3 short relevant follow-up questions.

@@ -1,6 +1,7 @@
 /**
  * CAMPUS CONNECT - AI Service
  * Handles Google Gemini API integration with fallback grounded semantic processor.
+ * Presidency University, Bengaluru | School of Computer Science & Engineering
  */
 
 const { KNOWLEDGE_BASE, SYSTEM_PROMPT } = require('./knowledgeBase');
@@ -10,17 +11,110 @@ const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 
 /**
  * Intelligent Local Grounded Engine (Used as resilient fallback or offline engine)
+ * Supports natural greetings, identity questions, and strict KB answers.
  */
 function processWithGroundedEngine(query, history = []) {
-  const normalized = query.toLowerCase().trim();
+  const normalized = query.toLowerCase().trim().replace(/[?!.,;]+$/, '');
 
-  // 1. Detect if asking for specific unavailable details (dates, fees, names, numbers, percentages)
+  // 1. Detect Greetings (Hi, Hello, Hey, Good morning, etc.)
+  const isGreeting = /^(hi|hello|hey|hey\s+there|good\s*(morning|afternoon|evening|day)|greetings|hola|namaste)$/i.test(normalized) ||
+                     /^(hi|hello|hey)\s+(campus\s+connect|bot|assistant|buddy)/i.test(normalized);
+
+  if (isGreeting) {
+    const greetings = [
+      "Hello! 👋 Welcome to Campus Connect. I'm your AI-powered university assistant. How can I help you today?",
+      "Hey there! How can I assist you with your university-related queries today?",
+      "Good day! 👋 I'm here to assist you with all your Presidency University questions. What would you like to know?"
+    ];
+    // Return friendly greeting
+    return {
+      response: greetings[0],
+      category: 'conversational',
+      confidence: 'high',
+      isAvailableInKB: true,
+      provider: 'grounded-engine',
+      suggestedFollowUps: [
+        'Whom should I contact for academic problems?',
+        'Where can I find the examination timetable?',
+        'What can you do?'
+      ],
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // 2. Detect Identity questions ("Who are you?", "What is your name?")
+  const isIdentity = /^(who\s+are\s+you|what\s+is\s+your\s+name|what\s+are\s+you|tell\s+me\s+about\s+yourself|who\s+made\s+you)/i.test(normalized);
+  if (isIdentity) {
+    return {
+      response: "I'm Campus Connect, your AI-powered university helpdesk assistant. I can help you find information about academics, attendance, examinations, placements, hostel facilities, library services, administration and university events.",
+      category: 'conversational',
+      confidence: 'high',
+      isAvailableInKB: true,
+      provider: 'grounded-engine',
+      suggestedFollowUps: [
+        'Whom should I contact for academic problems?',
+        'Whom should I contact for placement training?',
+        'Where can I find the examination timetable?'
+      ],
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // 3. Detect Capability questions ("What can you do?", "How can you help?")
+  const isCapability = /^(what\s+can\s+you\s+do|how\s+can\s+you\s+help|what\s+do\s+you\s+do|can\s+you\s+help\s+me|help\s+me)$/i.test(normalized);
+  if (isCapability) {
+    return {
+      response: "I can guide you through various university services and help answer your campus-related questions using the available university information. You can ask me about academics, attendance, examinations, placements, library, hostel, administration, and university events.",
+      category: 'conversational',
+      confidence: 'high',
+      isAvailableInKB: true,
+      provider: 'grounded-engine',
+      suggestedFollowUps: [
+        'Whom should I contact for placement training?',
+        'How can I raise a hostel complaint?',
+        'How can I access library resources?'
+      ],
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // 4. Detect Courtesies (Thanks, Bye)
+  const isThanks = /^(thanks|thank\s+you|thankyou|thx|appreciate\s+it|thank\s+you\s+so\s+much)/i.test(normalized);
+  if (isThanks) {
+    return {
+      response: "You're very welcome! 😊 Feel free to ask anytime if you have any more university questions. Wishing you all the best in your studies!",
+      category: 'conversational',
+      confidence: 'high',
+      isAvailableInKB: true,
+      provider: 'grounded-engine',
+      suggestedFollowUps: [
+        'Where can I find the examination timetable?',
+        'Where are university event announcements posted?'
+      ],
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  const isBye = /^(bye|goodbye|see\s+you|cya|take\s+care)$/i.test(normalized);
+  if (isBye) {
+    return {
+      response: "Goodbye! Have a productive and wonderful day at Presidency University! 👋",
+      category: 'conversational',
+      confidence: 'high',
+      isAvailableInKB: true,
+      provider: 'grounded-engine',
+      suggestedFollowUps: ['Whom should I contact for academic problems?'],
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // 5. Detect if asking for specific unavailable details (dates, fees, names, numbers, percentages)
   const isAskingSpecificDate = /\b(exact date|when is the date|what date|which day|schedule date|next exam date)\b/i.test(normalized);
   const isAskingSpecificFee = /\b(fee|cost|how much money|charges|pricing|amount to pay)\b/i.test(normalized);
   const isAskingSpecificContact = /\b(phone number|mobile|email address|whatsapp|contact number|cell)\b/i.test(normalized);
   const isAskingSpecificPercentage = /\b(how much percentage|what percent|75%|80%|exact attendance percentage)\b/i.test(normalized);
 
-  // 2. Intent matching across the 8 categories
+  // 6. Intent matching across the 8 categories
   let matchedCategory = null;
   let highestScore = 0;
 
@@ -37,7 +131,7 @@ function processWithGroundedEngine(query, history = []) {
     }
   }
 
-  // 3. Response generation grounded strictly in the official KB
+  // 7. Response generation grounded strictly in the official KB
   let responseText = '';
   let isAvailableInKB = true;
   let category = matchedCategory || 'general';
@@ -122,7 +216,6 @@ async function callGeminiApi(apiKey, query, history = []) {
   // Build conversation context
   const contents = [];
 
-  // Add system instruction as first user/model context or system prompt
   const formattedSystemPrompt = `${SYSTEM_PROMPT}\n\nIMPORTANT: Format your response as a valid JSON object only with keys: "response" (string), "category" (string), "confidence" ("high"|"medium"|"low"), "isAvailableInKB" (boolean), "suggestedFollowUps" (array of 2 strings). Do not wrap in markdown quotes if possible, or use standard json formatting.`;
 
   // Include recent history (up to last 6 turns)
@@ -148,9 +241,9 @@ async function callGeminiApi(apiKey, query, history = []) {
       parts: [{ text: formattedSystemPrompt }]
     },
     generationConfig: {
-      temperature: 0.2, // Low temperature for factual consistency
-      topP: 0.8,
-      maxOutputTokens: 500,
+      temperature: 0.3, // Friendly, balanced conversational tone while preserving factual grounding
+      topP: 0.85,
+      maxOutputTokens: 600,
       responseMimeType: 'application/json'
     }
   };
@@ -217,7 +310,7 @@ async function answerStudentQuery(query, history = [], customApiKey = null) {
     }
   }
 
-  console.log('[AI Service] No Gemini API Key configured. Using high-precision Grounded Engine.');
+  console.log('[AI Service] Processing query with Grounded Semantic & Conversational Engine.');
   return processWithGroundedEngine(query, history);
 }
 
