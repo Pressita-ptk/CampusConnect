@@ -80,11 +80,22 @@ export default function HeroSection({ onSubmitQuery, onSelectSuggestedQuery }) {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="text-center max-w-3xl mx-auto">
-          {/* Authentic Presidency University Location Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/20 text-xs font-semibold text-blue-200 mb-4 animate-fade-in shadow-lg">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <MapPin className="w-3.5 h-3.5 text-blue-300" />
-            <span>Presidency University, Bengaluru • {greeting}, Student! 👋</span>
+          {/* Authentic Presidency University Official Logo Card */}
+          <div className="mb-4 inline-flex items-center gap-3 bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl shadow-xl border border-white/40 animate-fade-in hover:scale-102 transition-transform">
+            <img 
+              src="/images/presidency-logo.png" 
+              alt="Presidency University" 
+              className="h-9 sm:h-11 w-auto object-contain"
+            />
+          </div>
+
+          {/* Location & Greeting Pill */}
+          <div className="block mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/20 text-xs font-semibold text-blue-200 shadow-lg">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <MapPin className="w-3.5 h-3.5 text-blue-300" />
+              <span>Presidency University, Bengaluru • {greeting}, Student! 👋</span>
+            </div>
           </div>
 
           {/* Main Title & Catchphrase */}
